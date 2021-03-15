@@ -1,0 +1,17 @@
+{
+  "name": "homework1",
+  "version": "1.0.0",
+  "description": "fife homeorks",
+  "main": "homework1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Liana Mardanyan",
+  "license": "ISC",
+  "dependencies": {
+    "current-time": "^1.0.1",
+    "current-time-cli": "^1.0.0",
+    "random": "^3.0.3"
+  },
+  "devDependencies": {}
+}

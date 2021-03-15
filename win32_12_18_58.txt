@@ -1,0 +1,12 @@
+console.log("file absolute path is: " + __filename + " length is: " + __filename.length);
+const random = require('random');
+let i = 0;
+while ( i < 5 ){
+	console.log( random.int( 0, 100 ) );
+	i++;
+}
+const currenTime = require('current-time');
+console.log( currenTime.currenTime('What is the time in Vanadzor' ));
+
+const wordsFromString = require('./modules/wordsFromString');
+wordsFromString.wordsFromString('my name is $$$$$$$ hh 333 ## .d.d.d'); 
