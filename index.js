@@ -6,12 +6,12 @@ const {Readable, Duplex, Writable, Transform} = require('stream');
 // const readFileWithStream = fs.createReadStream('input.txt',{ highWaterMark:10});
 // readFileWithStream.on('data', (chunk)=>{
 
-//  	if ( !/[@#$%\^!\(\)\+\{\}\\\.]/gmi.test( chunk.toString() ) ) {
+//      if ( !/[@#$%\^!\(\)\+\{\}\\\.]/gmi.test( chunk.toString() ) ) {
 //             console.log( chunk.toString() );
 //     }
 // });
 // readFileWithStream.on('error', (err) => {
-//    	throw new Error( err );
+//      throw new Error( err );
 // });
 /*2.Գրել ծրագիր որ լատինատառ տեքստը որևէ մոտավորությամբ կսարքի հայատառ: Օրինակ ա տառը կդառնա a:Այդպես 
 բոլոր տառերը: Ստեղծել readStream և highWaterMark:1  նշելով բոլոր սիմվոլների վրայով անցնել: 
@@ -21,14 +21,14 @@ const {Readable, Duplex, Writable, Transform} = require('stream');
 // const readFileWithStream = fs.createReadStream('homework4eng.txt','utf-8',{highWaterMark:1});
 
 // readFileWithStream.on('data', (chunk) =>{ 
-// 	let newContent ='';
-// 	const writeDatas = fs.createWriteStream('homework4eng.txt');
-// 	for(let val of chunk.toString()){
+//  let newContent ='';
+//  const writeDatas = fs.createWriteStream('homework4eng.txt');
+//  for(let val of chunk.toString()){
 
-// 		newContent +=englishAlpabet.indexOf(val.toUpperCase()) > -1 ? armenianAlpabet[englishAlpabet.indexOf(val.toUpperCase())] : val;
-// 	}
-// 	writeDatas.write(newContent);
-	
+//      newContent +=englishAlpabet.indexOf(val.toUpperCase()) > -1 ? armenianAlpabet[englishAlpabet.indexOf(val.toUpperCase())] : val;
+//  }
+//  writeDatas.write(newContent);
+    
 // });
 // readFileWithStream.on('error',(err)=>{ console.log(err.message)});
 /*3.Ստեղծել  RemoveSpecialCharsկլաս, որը ժառանգում է  Transform կլասին: _transform մեթոդը վերասահմանել
@@ -36,56 +36,56 @@ const {Readable, Duplex, Writable, Transform} = require('stream');
 
 Կլասից ստեղծել օբեկտ: homeworkr5.txt պարունակությունը pipe անել օբեկտով և պահապանել homeworkw5.txt ֆայլում:
 */
-// const readStream = fs.createReadStream('homeworkr5.txt', {
-//     highWaterMark: 1
-// });
-// const writeStreame = fs.createWriteStream('homeworkw5.txt');
-// class RemoveSpecialChars extends Transform{
-// 	constructor(char){
-// 		super();
-// 		//this.withoutSpecialChar = char;
-// 		//console.log(withoutSpecialChar);
-// 	}
-// 	_transform(chunk, encoding, next) {
-// 		let newStr = '';
-// 		for(let i=0; i< str.length;i++){
-// 			if ( !/[@#$%\^!\(\)\+\{\}\\\.]/gmi.test( chunk[i].toString() ) ) {
-// 				newStr += chunk[i];
-// 			}else{
-// 				newStr += '';
-// 			}
-// 		}
-// 		this.push(newStr);
-//         next();
+const readStream = fs.createReadStream('homeworkr5.txt', {
+    highWaterMark: 1
+});
+const writeStreame = fs.createWriteStream('homeworkw5.txt');
+class RemoveSpecialChars extends Transform{
+    constructor(char){
+        super();
+        //this.withoutSpecialChar = char;
+        //console.log(withoutSpecialChar);
+    }
+    _transform(chunk, encoding, next) {
+        let newStr = '';
         
-//     }
-//     _flush( callback){
-//     	this.push('transforms...');
-//     	callback();
-//     }
-// }
-// const newObj = new RemoveSpecialChars(readStream);
-// process.stdin.pipe(newObj).pipe(writeStreame);
+            if ( !/[@#$%\^!\(\)\+\{\}\\\.]/gmi.test( chunk.toString() ) ) {
+                newStr += chunk;
+            }else{
+                newStr += '';
+            }
+
+        this.push(newStr);
+        next();
+        
+    }
+    _flush( callback){
+        this.push('transforms...');
+        callback();
+    }
+}
+const newObj = new RemoveSpecialChars();
+readStream.pipe(newObj).pipe(writeStreame);
 
 /*4.Ստեղծել Promise վերադարձնող ֆունկցիա որը ստանում է տեքստ ֆայլի հասցե և տեքստի բառերի առաջին տառերը 
 սաքում մեծատառ․ */
 
- function changeText(src) {
+//  function changeText(src) {
 
-    return new Promise( function (resolve, reject) {
-    	 const readFileWithStream = fs.createReadStream(src,'utf-8');
-    	 readFileWithStream.on('data', (chunk)=>{
-    	 	const newChunk = chunk.split(" ").map((word)=>{
-    	 		return word.charAt(0).toUpperCase() + word.slice(1);
-    	 	});
+//     return new Promise( function (resolve, reject) {
+//       const readFileWithStream = fs.createReadStream(src,'utf-8');
+//       readFileWithStream.on('data', (chunk)=>{
+//          const newChunk = chunk.split(" ").map((word)=>{
+//              return word.charAt(0).toUpperCase() + word.slice(1);
+//          });
 
-			resolve(newChunk.join(" "));
-    	 });
-    	 readFileWithStream.on('error',(err)=>{ console.log(err.message)});
-    	
-    });
-}
-changeText('task-4.txt').then( (chunk) => { 
-	const writeStreame = fs.createWriteStream('task-4.txt');
-	writeStreame.write(chunk);
-}).catch( (err) => console.log("Can\'t push chunk",err));;
+//          resolve(newChunk.join(" "));
+//       });
+//       readFileWithStream.on('error',(err)=>{ console.log(err.message)});
+        
+//     });
+// }
+// changeText('task-4.txt').then( (chunk) => { 
+//  const writeStreame = fs.createWriteStream('task-4.txt');
+//  writeStreame.write(chunk);
+// }).catch( (err) => console.log("Can\'t push chunk",err));
