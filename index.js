@@ -6,7 +6,7 @@ const express = require('express');
 // app.use(express.json());
 // const router = require('./routes/user');
 // app.use(router);
-// app.listen(2021);
+// app.listen(2021); 
 
 /*2. Ունենք users.json ֆայլ , այն սկզբում պարունակում է դատարկ օբյեկտ․ Ոնենալ users route որի վրա կարելի է կատարել
  get և post request : post -ի body-ն պարունակելու է username, name, image դաշտերը։ 
