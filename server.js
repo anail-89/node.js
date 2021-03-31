@@ -1,0 +1,10 @@
+const http = require('http');
+const express = require('express');
+const app = express();
+const router = require('./router');
+//const router = require('./routes/users');
+global.__homedir = __dirname;
+app.use(express.urlencoded({extended: false}));
+app.use(express.json());
+router(app);	
+app.listen(2021);
