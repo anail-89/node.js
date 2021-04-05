@@ -18,6 +18,7 @@ const {Types} = require('mongoose');
 const fs = require('fs').promises;
 const User = require('../models/users');
 const UserCtrl = require('../controllers/users-controller');
+const {body, validationResult} = require('express-validator');
 
 const usersJsonPath = path.join(__homedir, './users.json');
 
@@ -37,10 +38,24 @@ router.route('/').get(async (req, res) => {
         success: true,
         data: users
     });
-}).post(upload.single('image'), async (req, res) => {
+}).post( 
+    upload.single('image'),body('name').exists().bail().isLength({ min:6}), async (req, res) => {
+    consr errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({ errors:errors.array()});
+    }
     try {
     //
-    await UserCtrl.add(req, res);
+    const userdata = await UserCtrl.add({
+        username: req.body.username,
+        name: req.body.name,
+        file: req.file
+    });
+    res.json({
+            success: true,
+            data: userdata,
+            message: 'User created'
+        });
 
     } catch (e) {
         await fs.unlink(path.join(__homedir, req.file.path));

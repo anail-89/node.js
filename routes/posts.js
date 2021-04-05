@@ -2,12 +2,23 @@ const express = require('express');
 const router = express.Router();
 const Posts = require('../models/posts');
 const Users = require('../models/users');
+const {body, validationResult} = require('express-validator');
+const {ObjectId} = require('mongoose').Types;
+
 router.route('/').get( async (req, res) => {
     const posts = await Posts.find().populate({
     	path: 'author',
     	select: 'name username -_id'});
     res.json(posts);
-}).post(async (req, res) => {
+}).post(
+body('userId').custom( ( value, {req, res} )=>{
+    return ObjectId.isValid(value);
+}),
+async (req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({ errors:errors.array()});
+    }
 	const user = await Users.findById(req.body.userId);
 	if( !user ){
 		throw new Error("User don't found");

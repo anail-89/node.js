@@ -1,27 +1,28 @@
 const User = require('../models/users');
 class UserCtrl{
-	getById(){
+	getById(id){
+        return User.findById(id);
 
 	}
 	getAll(){
 
 	}
-	async add(req, res){
-		if (await User.exists({username: req.body.username})) {
+	async add(data){
+		if (await User.exists({username: data.username})) {
             throw new Error('User exists');
         } else {
             const user = new User({
-                name: req.body.name,
-                image: req.file.path
+                name: data.name,
+                image: data.file.path
             });
-            user.username = req.body.username;
+            user.username = data.username;
 
-            await user.save();
-            res.json({
-                success: true,
-                data: user,
-                message: 'user created'
-            });
+            return user.save();
+            // res.json({
+            //     success: true,
+            //     data: user,
+            //     message: 'user created'
+            // });
         }
 	}
 	update(){
