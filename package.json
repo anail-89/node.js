@@ -15,5 +15,9 @@
   },
   "devDependencies": {
     "cors": "^2.8.5"
-  }
+  },
+  "description": "",
+  "main": "router.js",
+  "author": "Liana",
+  "license": "ISC"
 }

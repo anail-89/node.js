@@ -40,9 +40,10 @@ router.route('/').get(async (req, res) => {
     });
 }).post( 
     upload.single('image'),body('name').exists().bail().isLength({ min:6}), async (req, res) => {
-    consr errors = validationResult(req);
+    
+    const errors = validationResult(req);
     if(!errors.isEmpty()){
-        return res.status(400).json({ errors:errors.array()});
+        return res.status(400).json({ errors:errors.mapped()});
     }
     try {
     //
