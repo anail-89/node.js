@@ -14,7 +14,7 @@ window.addEventListener('load', async ()=>{
         form.append('image', file);
         register(form).then( data=>{
 		if(data.success === true){
-			window.location.href = 'frontend/login.html';
+			window.location.href = 'login.html';
 		}else{
 			errorLabel.innerText = data.message;
 		}
