@@ -6,29 +6,28 @@ const {Types} = require('mongoose');
 const fs = require('fs').promises;
 const User = require('../models/users');
 const UserCtrl = require('../controllers/users-controller');
-const {body} = require('express-validator');
+const {body, param, check} = require('express-validator');
 const responseManager = require('../middlewares/response-handler');
 const AppError = require('../managers/app-error');
 const validationResult = require('../middlewares/validation-result');
 const Bcrypt = require('../managers/bcrypt');
 const usersJsonPath = path.join(__homedir, './users.json');
 
-router.route('/').get(async (req, res) => {
-    const options = {};
-    const limit = {};
-    if (req.query.name) {
-        options.name = req.query.name;
+router.route('/').get( responseManager,async (req, res) => {
+    try { 
+        const options = {};
+        const limit = {};
+        if (req.query.name) {
+            options.name = req.query.name;
+        } 
+        if (req.query.limit) {
+            limit.limit = Number(req.query.limit);
+        }
+        const userDatas = await UserCtrl.getAll( options, limit );
+        res.onSuccess(userDatas, '');
+    } catch (e) {
+        res.onError(e); 
     }
-
-    if (req.query.limit) {
-        limit.limit = Number(req.query.limit);
-    }
-
-    const users = await User.find(options, null, limit);
-    res.json({
-        success: true,
-        data: users
-    });
 }).post( 
     upload.single('image'),
     body('name').exists().bail().isLength({ min:6}),
@@ -38,97 +37,74 @@ router.route('/').get(async (req, res) => {
     validationResult, 
     responseManager,
     async (req, res) => {
-    
 
-    try {
-    //
-    let userdata = await UserCtrl.add({
-        username: req.body.username,
-        name: req.body.name,
-        file: req.file,
-        password: await Bcrypt.hash(req.body.password)
-    });
-    userdata = userdata.toObject();
-    delete userdata.password;
-    res.json({
-            success: true,
-            data: userdata,
-            message: 'User created'
-        });
+        try {
 
-    } catch (e) {
-        await fs.unlink(path.join(__homedir, req.file.path));
-        res.json({
-            success: false,
-            data: null,
-            message: e.message
-        });
-    }
+            let userdata = await UserCtrl.add({
+                username: req.body.username,
+                name: req.body.name,
+                file: req.file.path,
+                password: await Bcrypt.hash(req.body.password)
+            });
+            userdata = userdata.toObject(); 
+            delete userdata.password;
+            res.onSuccess(userdata,'User created');
+
+        } catch (e) {
+            await fs.unlink(path.join(__homedir, req.file.path));
+            res.onError(e); 
+        }
 });
 
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get( responseManager, async (req, res) => {
     // Types.ObjectId.isValid(req.params.id);
-    const user = await User.findOne({_id: req.params.id});
+    try{
+         const user = await UserCtrl.getById(req.params.id);
+         res.onSuccess(user, '');
+    }catch(e){
+        res.onError(e);
+    }
+}).put(
 
-    if (user) {
-        res.json({
-            success: true,
-            data: user
-        });
-    } else {
-        res.json({
-            success: false,
-            data: null,
-            message: 'User not fond'
-        });
-    }
-}).put(upload.single('image'), async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        // await User.findOneAndUpdate({_id: req.params.id}, {
-        //     name: req.body.name,
-        //     image: req.file.path
-        // });
-        if (user) {
-            await fs.unlink(path.join(__homedir, user.image));
-            user.name = req.body.name;
-            user.image = req.file.path;
-            await user.save();
-            res.json({
-                success: true,
-                data: user,
-                message: 'user updated'
+    upload.single('image'),
+    param('id').custom( ( value, {req, res} )=>{
+        return ObjectId.isValid(value);
+    }),
+    check('name','Name is required!').exists(),
+    check('username','UserName is required!').exists(),
+    responseManager,
+    validationResult,
+    async (req, res) => {
+        try {
+
+            let userdata = await UserCtrl.update({
+                username: req.body.username,
+                name: req.body.name,
+                file: req.file.path,
+                password: await Bcrypt.hash(req.body.password),
+                id:req.params.id
             });
-        } else {
-            throw new Error('User not found');
+            userdata = userdata.toObject(); 
+            delete userdata.password;
+            res.onSuccess(userdata,'User updated');
+
+        } catch (e) {
+            await fs.unlink(path.join(__homedir, req.file.path));
+            res.onError(e); 
         }
-    } catch (e) {
-        await fs.unlink(path.join(__homedir, req.file.path));
-        res.json({
-            success: false,
-            data: null,
-            message: e.message
-        });
-    }
-}).delete(async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (user) {
-            await user.remove();
-            await fs.unlink(path.join(__homedir, user.image));
-            res.json({
-                success: true
-            });
-        } else {
-            throw new Error('User Not Found');
+          
+}).delete(
+    check('id').exists(), 
+    responseManager,
+    async(req, res) => {
+        try { 
+            const postData = await UserCtrl.delete({
+                  id: req.params.id
+                });
+            res.onSuccess({}, 'User deleted');
+        } catch (e) {
+            res.onError(e);
         }
-    } catch (e) {
-        res.json({
-            success: false,
-            data: null,
-            message: e.message
-        });
-    }
 });
 
 
