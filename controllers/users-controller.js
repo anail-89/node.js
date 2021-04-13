@@ -15,9 +15,10 @@ class UserCtrl{
         }else{
             const user = new User({
                 name: data.name,
-                image: data.file,
+                image: data.file ? data.file.path : undefined,
                 username: data.username,
-                password: data.password
+                password: data.password,
+                email: data.email
             }); 
             
         return user.save();
@@ -31,6 +32,7 @@ class UserCtrl{
             user.image= data.file;
             user.username = data.username;
             user.password = data.password;
+            user.email = data.email;
             return user.save();
         }else{
             throw new Error('User doesn"t exists');

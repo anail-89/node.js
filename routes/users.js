@@ -12,7 +12,7 @@ const AppError = require('../managers/app-error');
 const validationResult = require('../middlewares/validation-result');
 const Bcrypt = require('../managers/bcrypt');
 const usersJsonPath = path.join(__homedir, './users.json');
-
+const validateToken = require('../middlewares/validation-token');
 router.route('/').get( responseManager,async (req, res) => {
     try { 
         const options = {};
@@ -55,7 +55,19 @@ router.route('/').get( responseManager,async (req, res) => {
             res.onError(e); 
         }
 });
+router.post('/current',
+    responseManager,
+    validateToken,
+    async (req, res) => {
+        try {
+            const user = await UserCtrl.getById(req.decoded.userId);
+            res.onSuccess(user);
+        } catch (e) {
+            res.onError(e);
+        }
 
+    }
+);
 router.route('/:id').get( responseManager, async (req, res) => {
     // Types.ObjectId.isValid(req.params.id);
     try{

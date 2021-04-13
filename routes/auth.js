@@ -7,6 +7,7 @@ const validationResult = require('../middlewares/validation-result');
 const Bcrypt = require('../managers/bcrypt');
 const Authentication =  require('../controllers/auth-controller');
 const upload = require('../middlewares/upload');
+const email = require('../managers/email-manager');
 
 router.route('/login').post(
 	body('username').exists(),
@@ -33,20 +34,25 @@ router.route('/register').post(
         return new RegExp("^[A-Z0-9.,/ $@()]+$").test(value);
     }),
     body('username').exists(),
+    body('email').isEmail(),
     validationResult, 
     responseManager,
 
 	async (req, res )=>{
-		try { 
-            const auth = await Authentication.register({
+		try {  
+            const userdata = await Authentication.register({
+                  email: req.body.email,
                   username: req.body.username,
                   password: req.body.password,
                   name: req.body.name,
                   image: req.file.path
                 });
+            userdata = userdata.toObject();
+            delete userdata.password;
                
-            res.onSuccess(auth,'Successfully register'); 
+            res.onSuccess(userdata,'Successfully register'); 
         } catch (e) {
+           //await fs.unlink(path.join(__homedir, req.file.path));
            res.onError(e);
         };
 	
