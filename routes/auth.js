@@ -8,6 +8,9 @@ const Bcrypt = require('../managers/bcrypt');
 const Authentication =  require('../controllers/auth-controller');
 const upload = require('../middlewares/upload');
 const email = require('../managers/email-manager');
+const fs = require('fs');
+const path = require('path');
+const {query} = require('express-validator');
 
 router.route('/login').post(
 	body('username').exists(),
@@ -47,9 +50,10 @@ router.route('/register').post(
                   name: req.body.name,
                   image: req.file.path
                 });
-            userdata = userdata.toObject();
-            delete userdata.password;
-               
+            
+           //userdata = JSON.parse(userdata);
+           //delete userdata.password;
+             
             res.onSuccess(userdata,'Successfully register'); 
         } catch (e) {
            //await fs.unlink(path.join(__homedir, req.file.path));
@@ -57,5 +61,18 @@ router.route('/register').post(
         };
 	
 });
+router.get('/activate',
+    query('code').exists(), 
+    responseManager,
+    validationResult,
+    async (req, res) => {
+        try {
+            await Authentication.activate(req.query.code);
+            res.onSuccess();
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+); 
 
 module.exports = router;

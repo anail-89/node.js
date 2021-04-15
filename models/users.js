@@ -7,7 +7,7 @@ const UserSchema = new Schema({
     name: String,
     image: String,
     password: String,
-    isActivate:{ type:String,default:false}
+    isActive:{ type:String,default:false}
 
 }, {versionKey: false, timestamps: true});
 UserSchema.set('collection', 'users'); 

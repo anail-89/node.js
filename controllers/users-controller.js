@@ -1,6 +1,8 @@
 const User = require('../models/users');
 const path = require('path');
 const fs = require('fs').promises;
+const Bcrypt = require('../managers/bcrypt');
+
 class UserCtrl{
 	getById(id){
         return User.findById(id);
@@ -13,11 +15,12 @@ class UserCtrl{
 		if ( await User.exists( {username: data.username} ) ) {
             throw new Error('User exists');
         }else{
+           
             const user = new User({
                 name: data.name,
                 image: data.file ? data.file.path : undefined,
                 username: data.username,
-                password: data.password,
+                password: await Bcrypt.hash(data.password),
                 email: data.email
             }); 
             
@@ -49,6 +52,10 @@ class UserCtrl{
             return user.remove(); 
         }
 	}
+    findOne(options){
+        return User.findOne(options);
+    }
+
 }
 
 module.exports = new UserCtrl();
