@@ -42,7 +42,38 @@ class Authentication{
             return user.save();
         }
         throw new AppError('Invalid code', 403);
-    };
+    }
+    async forgotPassword(data) {
+        const user = await UserCtrl.findOne({email: data.email});
+        if (!user) {
+            throw new AppError('User not found', 404);
+        }
+        const token = TokenManager.encode({
+            email: user.email,
+            action: 'forgot'
+        }, 3600);
+        await email(user.email, 'Node js reset password',
+            `<a href="http://localhost/frontend/reset-password.html?activation-code=${token}&_ijt=ejecqcijl13tptpech4g50mju7">Reset Password</a>`
+        );
+    }
+    async resetPassword(data){
+        const decoded = await TokenManager.decode(data.code);
+        if (decoded.email && decoded.action === 'forgot') {
+            const user = await UserCtrl.findOne({email: decoded.email});
+            // if (!user) {
+            //     throw new AppError('Invalid code', 403);
+            // }
+              
+            if( Object.keys(user).length !== 0){ 
+                 user.password = await Bcrypt.hash(data.password);
+                return user.save();
+            }else{
+                throw new AppError('Invalid code', 403);
+            }
+           
+        } 
+        throw new AppError('Invalid code', 403);
+    }
 }
 
 module.exports = new Authentication();

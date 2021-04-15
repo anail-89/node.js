@@ -74,5 +74,36 @@ router.get('/activate',
         }
     }
 ); 
-
+router.post('/forgot-password',
+    body('email').isEmail(),
+    responseManager,
+    validationResult,
+    async (req, res) => {
+        try {
+            await Authentication.forgotPassword({
+                email: req.body.email
+            });
+            res.onSuccess({}, 'Email sent');
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+);
+router.post('/reset-password',
+    query('code').exists(),
+    body('password').exists(),
+    responseManager,
+    validationResult,
+    async (req, res) => {
+        try { 
+            await Authentication.resetPassword({
+                code: req.query.code,
+                password: req.body.password
+            });
+            res.onSuccess({}, 'Password have been changed');
+        } catch (e) { 
+            res.onError(e);
+        }
+    }
+);
 module.exports = router;
