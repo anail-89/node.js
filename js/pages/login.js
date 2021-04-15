@@ -3,7 +3,7 @@ import {login} from '../api/auth.js';
 window.addEventListener('load', async () => {
     const token = window.localStorage.getItem('token');
     if(token){
-        window.location.href = '/home.html';
+        window.location.href = 'home.html';
     }
     document.getElementById('login').addEventListener('click', async () => {
         const errorLabel = document.getElementById('error-label');

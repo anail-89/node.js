@@ -19,3 +19,13 @@ export const login = async (username, password)=>{
 	});
 	return response.json();
 }
+export const activate = async (token) => {
+    const response = await fetch('http://localhost:2021/auth/activate?code=' + token, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    return response.json();
+}
