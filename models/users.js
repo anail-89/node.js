@@ -7,7 +7,8 @@ const UserSchema = new Schema({
     name: String,
     image: String,
     password: String,
-    isActive:{ type:String,default:false}
+    isActive:{ type:String,default:false},
+   // friends: [{type: Schema.Types.ObjectId, ref: 'Users'}]
 
 }, {versionKey: false, timestamps: true});
 UserSchema.set('collection', 'users'); 

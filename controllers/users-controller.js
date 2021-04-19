@@ -55,6 +55,12 @@ class UserCtrl{
     findOne(options){
         return User.findOne(options);
     }
+    async getFriendRequests(data) {
+        const {userId} = data;
+        const user = await User.findById(userId).populate('friendRequests', '_id name').lean();
+
+        return user.friendRequests;
+    }
 
 }
 

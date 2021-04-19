@@ -118,6 +118,19 @@ router.route('/:id').get( responseManager, async (req, res) => {
             res.onError(e);
         }
 });
-
+router.route('/friends').get(
+    responseManager,
+    validateToken,
+    async (req, res) => {
+        try {
+            const friends = await UserCtrl.getFriends({
+                userId: req.decoded.userId
+            })
+            res.onSuccess(friends);
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+); 
 
 module.exports = router;
