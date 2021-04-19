@@ -13,19 +13,17 @@ const validationResult = require('../middlewares/validation-result');
 const Bcrypt = require('../managers/bcrypt');
 const usersJsonPath = path.join(__homedir, './users.json');
 const validateToken = require('../middlewares/validation-token');
-router.route('/').get( responseManager,async (req, res) => {
+router.route('/').get(
+ responseManager,
+ validateToken,
+ async (req, res) => {
     try { 
-        const options = {};
-        const limit = {};
-        if (req.query.name) {
-            options.name = req.query.name;
-        } 
-        if (req.query.limit) {
-            limit.limit = Number(req.query.limit);
-        }
-        const userDatas = await UserCtrl.getAll( options, limit );
-        res.onSuccess(userDatas, '');
-    } catch (e) {
+            const users = await UserCtrl.getAll({
+                name: req.query.name,
+                userId: req.decoded.userId
+            });
+            res.onSuccess(users);
+    } catch (e) { 
         res.onError(e); 
     }
 }).post( 
@@ -132,5 +130,36 @@ router.route('/friends').get(
         }
     }
 ); 
+router.route('/friend-request').post(
+    responseManager,
+    body('to').exists(),
+    validateToken,
+    async (req, res) => {
+        try {
+            await UserCtrl.friendRequest({
+                from: req.decoded.userId,
+                to: req.body.to
+            });
+            res.onSuccess();
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+).get(
+    responseManager,
+    validateToken,
+    async (req, res) => {
+        try {
+           const friendRequests =  await UserCtrl.getFriendRequests({
+                    userId: req.decoded.userId
+                });console.log(friendRequests);
+            res.onSuccess( friendRequests);
+                
+            
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+);
 
 module.exports = router;
