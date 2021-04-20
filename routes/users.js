@@ -66,6 +66,50 @@ router.post('/current',
 
     }
 );
+router.route('/friends').get(
+    responseManager,
+    validateToken,
+    async (req, res) => {
+        try {
+            const friends = await UserCtrl.getFriends({
+                userId: req.decoded.userId
+            })
+            res.onSuccess(friends);
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+); 
+router.route('/friend-request').post(
+    responseManager,
+    body('to').exists(),
+    validateToken,
+    async (req, res) => {
+        try {
+            await UserCtrl.friendRequest({
+                from: req.decoded.userId,
+                to: req.body.to
+            });
+            res.onSuccess();
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+).get(
+    responseManager,
+    validateToken,
+    async (req, res) => {
+        try {
+            res.onSuccess(
+                await UserCtrl.getFriendRequests({
+                    userId: req.decoded.userId
+                })
+            );
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+);
 router.route('/:id').get( responseManager, async (req, res) => {
     // Types.ObjectId.isValid(req.params.id);
     try{
@@ -116,50 +160,7 @@ router.route('/:id').get( responseManager, async (req, res) => {
             res.onError(e);
         }
 });
-router.route('/friends').get(
-    responseManager,
-    validateToken,
-    async (req, res) => {
-        try {
-            const friends = await UserCtrl.getFriends({
-                userId: req.decoded.userId
-            })
-            res.onSuccess(friends);
-        } catch (e) {
-            res.onError(e);
-        }
-    }
-); 
-router.route('/friend-request').post(
-    responseManager,
-    body('to').exists(),
-    validateToken,
-    async (req, res) => {
-        try {
-            await UserCtrl.friendRequest({
-                from: req.decoded.userId,
-                to: req.body.to
-            });
-            res.onSuccess();
-        } catch (e) {
-            res.onError(e);
-        }
-    }
-).get(
-    responseManager,
-    validateToken,
-    async (req, res) => {
-        try {
-           const friendRequests =  await UserCtrl.getFriendRequests({
-                    userId: req.decoded.userId
-                });console.log(friendRequests);
-            res.onSuccess( friendRequests);
-                
-            
-        } catch (e) {
-            res.onError(e);
-        }
-    }
-);
+
+
 
 module.exports = router;

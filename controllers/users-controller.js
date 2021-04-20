@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const Bcrypt = require('../managers/bcrypt');
 const FriendRequest = require('../models/friend-request');
-
+const AppError = require('../managers/app-error');
 class UserCtrl{
 	getById(id){
         return User.findById(id);
@@ -69,20 +69,39 @@ class UserCtrl{
         return User.findOne(options);
     }
     async getFriendRequests(data) {
-        const {userId} = data; console.log(userId);
-        const user = await User.findById(userId).populate('FriendRequests', '_id name').lean();
+        const {userId} = data;
+        const user = await User.findById(userId).populate('friendRequests', '_id name').lean();
 
         return user.friendRequests;
     }
     async friendRequest(data) {
         const {from, to} = data;
-        if (!await User.findById(to)) {
+        const [user, toUser] = await Promise.all([
+            User.findById(from),
+            User.findById(to)
+        ]);
+
+        if (!toUser || !user || from === to) {
             throw new AppError('User not found', 404);
         }
-        if(await FriendRequest.findOne({from, to})){
-            throw new AppError('Request is sent', 403);
+        if (user.sentFriendRequests.includes(to) ||
+            user.friends.includes(to) ||
+            user.friendRequests.includes(to)) {
+            throw new AppError('Bad request', 403);
         }
-        return new FriendRequest({from, to}).save();
+        user.sentFriendRequests.push(to);
+        toUser.friendRequests.push(from);
+
+        return Promise.all([user.save(), toUser.save()]);
+    }
+    async getFriends(data) {
+        const {userId} = data;
+        const user = await User.findById(userId).populate('friends', '_id name image').lean();
+        if (!user) {
+            throw new AppError('User Not Found', 404);
+        }
+
+        return user.friends;
     }
 
 }
