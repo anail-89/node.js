@@ -46,17 +46,17 @@ export const friendRequest = async (to) => {
 }
 
 export const getFriendRequests = async () => {
-    const token = window.localStorage.getItem('token');
+    const token = window.localStorage.getItem('token'); 
     const response = await fetch('http://localhost:2021/users/friend-request', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'token': token
-        }
-    });
+        } 
+    });console.log(response);
     if (response.status === 401) {
         window.localStorage.removeItem('token');
         window.location.href = '/login.html'
     }
     return response.json();
-}
+} 

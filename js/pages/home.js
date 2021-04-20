@@ -12,26 +12,49 @@ window.addEventListener('load', async () => {
             document.getElementById('user-name').innerText = response.data.name;
         }
     });
-    getFriendRequests().then((response) => {
+    getFriendRequests().then((response) => { console.log(response);
         const tbody = document.querySelector('#requests tbody');
         const acceptClicks = () => {
-
+            const buttons = tbody.querySelectorAll('button.accept-request');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', async (e) => {
+                    const to = e.target.getAttribute('user-id');
+                    const response = await acceptFriendRequests(to);
+                    if (response.success) {
+                        alert('declined');
+                    }
+                });
+            }
         }
-        if (response.data && Object.keys(response.data).length > 0) {
+        const declineClicks = () => {
+            const buttons = tbody.querySelectorAll('button.decline-request');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', async (e) => {
+                    const to = e.target.getAttribute('user-id');
+                    const response = await declineFriendRequests(to);
+                    if (response.success) {
+                        alert('declined');
+                    }
+                });
+            }
+        }
+        if (response.data) {
             let innerHTML = '';
-            console.log(response.data);
             response.data.map(user => {
                 innerHTML += `<tr>
                             <td>${user.name}</td>
                             <td>
-                                <button class="friend-request" user-id="${user._id}" >Accept Request</button>
+                                <button class="accept-request" user-id="${user._id}" >Accept Request</button>
+                                <button class="decline-request" user-id="${user._id}" >Decline Request</button>
                             </td>
                         </tr>`;
             });
             tbody.innerHTML = innerHTML;
             acceptClicks();
+            declineClicks();
         }
     });
+
 
     const search = document.querySelector('input[name="find-friend"]');
     const tbody = document.querySelector('#users tbody');
