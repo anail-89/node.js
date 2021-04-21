@@ -103,6 +103,16 @@ class UserCtrl{
 
         return user.friends;
     }
+    async getFriendRequestsSendByMe(data){
+         const {userId} = data;
+         const user = await User.findById(userId);
+         if (!user ) {
+            throw new AppError('User not found', 404);
+        }
+
+        return user.sentFriendRequests; 
+
+    }
 
 }
 

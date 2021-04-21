@@ -79,7 +79,22 @@ router.route('/friends').get(
             res.onError(e);
         }
     }
-); 
+);  
+router.route('/find-send-friend-request-users').get(
+    responseManager,
+    validateToken,
+    async (req, res)=>{ 
+        try {
+            const sendRequsests = await UserCtrl.getFriendRequestsSendByMe({
+                    userId: req.decoded.userId
+                });
+            res.onSuccess(sendRequsests);
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+
+    );
 router.route('/friend-request').post(
     responseManager,
     body('to').exists(),
@@ -110,6 +125,7 @@ router.route('/friend-request').post(
         }
     }
 );
+
 router.route('/:id').get( responseManager, async (req, res) => {
     // Types.ObjectId.isValid(req.params.id);
     try{
