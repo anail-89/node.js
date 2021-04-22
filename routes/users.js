@@ -124,6 +124,36 @@ router.route('/friend-request').post(
             res.onError(e);
         }
     }
+).put(
+    responseManager,
+    body('to').exists(),
+    validateToken,
+    async (req, res) => {
+        try {
+            await UserCtrl.acceptFriendRequest({
+                userId: req.decoded.userId,
+                to: req.body.to
+            });
+            res.onSuccess({},'Accepted successfully done');
+        } catch (e) {
+            res.onError(e);
+        }
+    }
+).delete(
+    responseManager,
+    body('to').exists(),
+    validateToken,
+    async (req, res) => {
+        try {
+            await UsersCtrl.declineFriendRequest({
+                userId: req.decoded.userId,
+                to: req.body.to
+            });
+            res.onSuccess();
+        } catch (e) {
+            res.onError(e);
+        }
+    }
 );
 
 router.route('/:id').get( responseManager, async (req, res) => {

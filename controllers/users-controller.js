@@ -113,6 +113,49 @@ class UserCtrl{
         return user.sentFriendRequests; 
 
     }
+    async acceptFriendRequest(data){
+        const {userId, to} = data;
+        const [user, toUser] = await Promise.all([
+            User.findById(userId),
+            User.findById(to)
+        ]);
+
+        if (!toUser || !user) {
+            throw new AppError('User not found', 404);
+        }
+        if (user.friendRequests.includes(to) &&
+            !user.friends.includes(to)) {
+
+            user.friends.push(to);
+            toUser.friends.push(userId);
+
+            user.friendRequests.pull(to);
+            toUser.sentFriendRequests.pull(userId);
+
+            return Promise.all([user.save(), toUser.save()]);
+        }
+        throw new AppError('Bad request', 403);
+    }
+    async declineFriendRequest(data) {
+        const {userId, to} = data;
+        const [user, toUser] = await Promise.all([
+            User.findById(userId),
+            User.findById(to)
+        ]);
+
+        if (!toUser || !user) {
+            throw new AppError('User not found', 404);
+        }
+        if (user.friendRequests.includes(to) &&
+            !user.friends.includes(to)) {
+
+            user.friendRequests.pull(to);
+            toUser.sentFriendRequests.pull(userId);
+
+            return Promise.all([user.save(), toUser.save()]);
+        }
+        throw new AppError('Bad request', 403);
+    }
 
 }
 
