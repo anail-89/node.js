@@ -14,14 +14,14 @@ window.addEventListener('load', async ()=>{
         form.append('email', email);
         form.append('password', password);
         form.append('image', file);
-        register(form).then( data=>{
-		if(data.success === true){
-			window.location.href = 'login.html';
-		}else{
-			errorLabel.innerText = data.message;
-		}
+        register(form).then( data =>{
+			if(data.success === true){
+				window.location.href = '/login.html';
+			}else{
+				errorLabel.innerText = data.message;
+			}
 		
-	}).catch( e=> errorLabel.innerText = e.massage);
+		}).catch( e=> errorLabel.innerText = e.massage);
 
 	});
 
