@@ -100,7 +100,7 @@ class UserCtrl{
         if (!user) {
             throw new AppError('User Not Found', 404);
         }
-
+        console.log(user.friends);
         return user.friends;
     }
     async getFriendRequestsSendByMe(data){

@@ -70,7 +70,7 @@ router.route('/friends').get(
     responseManager,
     validateToken,
     async (req, res) => {
-        try {
+        try { 
             const friends = await UserCtrl.getFriends({
                 userId: req.decoded.userId
             })
@@ -145,7 +145,7 @@ router.route('/friend-request').post(
     validateToken,
     async (req, res) => {
         try {
-            await UsersCtrl.declineFriendRequest({
+            await UserCtrl.declineFriendRequest({
                 userId: req.decoded.userId,
                 to: req.body.to
             });
